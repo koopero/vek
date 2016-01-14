@@ -3,10 +3,10 @@ const vek = require('./index')
 
 
 process.stdout.write(
-  yaml.safeDump( vek.polygon( {
+  vek.polygon( {
       scale: 0.01,
       aspect: 4/3,
       sides: 3
     } )
-  )
+    .export()
 )

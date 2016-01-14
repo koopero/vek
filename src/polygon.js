@@ -22,6 +22,8 @@ function polygon() {
       , centre = opt.centre
       , pivot = vert( opt.centre )
 
+  s.vert( pivot )
+
   for ( var i = 0; i < sides; i ++ ) {
     var a = angle * i
       , p = vek.add( centre, vek.radial( opt.radius, a ) )
@@ -30,14 +32,12 @@ function polygon() {
     s.vert( v )
   }
 
-  for ( var side = 0; side < sides; side ++ ) {
-    var next = side == sides - 1 ? 0 : side + 1
+  for ( var side = 1; side <= sides; side ++ ) {
+    var next = ( side == sides ? 1 : side + 1 )
 
     s.edge( s.verts[side], s.verts[next] )
     s.face( s.verts[side], s.verts[next], pivot )
   }
-
-  s.vert( pivot )
 
   return s
 }

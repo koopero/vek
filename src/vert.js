@@ -7,6 +7,5 @@ const vek = require('./vek')
       } )
 
 function vert( p ) {
-  console.log( 'vert', p )
   return parser( arguments )
 }
