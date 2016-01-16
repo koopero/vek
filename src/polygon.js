@@ -5,10 +5,10 @@ const vek = require('./vek')
     , mesh = require('./mesh')
     , options = require('./options')
     , parser = options.parser( {
-        centre: vek,
-        generator: 'polygon',
+        pos: vek,
+        rad: options.float( 1 ),
+        gen: 'polygon',
         sides: options.int( 6 ),
-        radius: options.float( 1 ),
       } )
 
 polygon.options = parser
@@ -26,8 +26,9 @@ function polygon() {
 
   for ( var i = 0; i < sides; i ++ ) {
     var a = angle * i
-      , p = vek.add( centre, vek.radial( opt.radius, a ) )
-      , v = vert( p )
+      , pos = vek.add( centre, vek.radial( opt.rad, a ) )
+      , tex = vek.add( [ 0.5, 0.5 ], vek.radial( 0.5, a ) )
+      , v = vert( pos, tex )
 
     s.vert( v )
   }

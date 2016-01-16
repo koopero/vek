@@ -1,7 +1,13 @@
 module.exports = vek
 
+const _ = require('lodash')
+
+vek.NAMES = [
+  'x','y','z','w'
+]
+
 vek.is = function ( a ) {
-  return a && a.__isVek === vek
+  return ( a || false ) && a.__isVek === vek
 }
 
 vek.willParse = function ( a ) {
@@ -18,12 +24,15 @@ function vek() {
   const result = []
   parseArray( arguments )
   Object.defineProperty( result, '__isVek', { value: vek } )
+  Object.defineProperty( result, 'at', { value: function( ind ) {
+    return parseFloat( result[ ind ] ) || 0
+  } } )
   return result
 
   function parseArray( arr ) {
     for ( var i = 0; i < arr.length; i ++ ) {
       var arg = arr[i]
-      if ( Array.isArray( arg ) ) {
+      if ( Array.isArray( arg ) || vek.is( arg ) ) {
         parseArray( arg )
       } else if ( 'object' == typeof( arg ) ) {
         parseObject( arg )
@@ -66,22 +75,51 @@ vek.radial = function ( len, angle ) {
 
 vek.add = function () {
   var result = arguments[0]
-  for ( var i = 1; i < arguments.length; i ++ ) {
-    result = mapDouble( result, vek( arguments[i] ), function( a,b ) {
-      if ( !isNaN( b ) )
-        a = a || 0 +  b
 
-      return a
-    } )
+  for ( var i = 1; i < arguments.length; i ++ ) {
+    var arg = arguments[i]
+    result = map(
+      function( a,b ) {
+        b = parseFloat( b )
+        if ( !isNaN( b ) )
+          a = (a || 0) + b
+
+        return a
+      },
+      result,
+      vek( arg )
+    )
   }
+
 
   return result
 }
 
-function mapDouble( a, b, func ) {
-  var c = []
-  for ( var i = 0; i < a.length || i < b.length; i ++ ) {
-    c[i] = func( a[i], b[i], i )
+vek.fill = function () {
+  var v = vek.apply( null, _.slice( arguments, 0, -1 ) )
+    , a = parseInt( _.last( arguments ) ) || 0
+
+  while ( v.length < a ) {
+    v.push( 0 )
+  }
+
+  return v
+}
+
+function map( func ) {
+  const args = _.slice( arguments, 1 )
+      , length = _.reduce( args, function ( maxLength, arg ) {
+        const argLength = parseFloat( arg && arg.length ) || 0
+        return Math.max( maxLength, argLength )
+      }, 0 )
+      , c = []
+
+  // console.warn( 'map.start', length, args )
+
+  for ( var i = 0; i < length; i ++ ) {
+    c[i] = func.apply( null, args.map( function ( arg ) {
+      return arg && arg[ i ]
+    } ) )
   }
 
   return vek( c )

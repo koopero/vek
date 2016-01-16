@@ -16,13 +16,22 @@ options.parser = function ( keys ) {
             && _.isFunction( parser.willParse )
             && parser.willParse( arg )
           ) {
+            // console.warn('prim parse', key, parser( arg ) )
             result[key] = parser( arg )
             return
           }
         }
+
+        return arg
       } )
 
-    const values = _.merge.bind( null, {} ).apply( objects )
+    const values = {}
+    _.map( objects, function ( ob ) {
+      if ( ob )
+        _.extend( values, ob )
+    })
+
+    // console.warn('options.values', values, objects )
 
     _.map( keys, function ( parser, key ) {
       if ( key[0] == '#' )
@@ -30,8 +39,7 @@ options.parser = function ( keys ) {
 
       var value = values[key]
       if ( _.isFunction( parser ) ) {
-        if ( _.isUndefined( result[key] ) )
-          value = parser( value )
+        value = parser( result[key], value )
       } else if ( _.isUndefined( value ) ) {
         value = parser
       }
